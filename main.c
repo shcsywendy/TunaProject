@@ -1,29 +1,32 @@
-#include <stdio.h>
-#include "page_access_hash_table.hpp"
+#include "pebs.h"
+#include <sys/resource.h>
 
-int main() {
-    // Create an unordered_map using PageAccess as the key type
-    std::unordered_map<PageAccess, int, PageAccessHash> pageAccessCount;
+int main(int argc, char **argv) {
+	init();
+	
+	assert(0 == pthread_create(&sample_thread_t, NULL, sample_thread_func, NULL));
+	assert(0 == pthread_create(&sample_fast_t, NULL, sample_fast_func, NULL));
+	assert(0 == pthread_create(&sample_slow_t, NULL, sample_slow_func, NULL));
+	
+	void *thread_ret;
+	assert(0 == pthread_join(sample_thread_t, &thread_ret));
+	assert(PTHREAD_CANCELED == thread_ret);
+	
+	
+	void *thread_ret_fast;
+	assert(0 == pthread_join(sample_fast_t, &thread_ret_fast));
+	assert(PTHREAD_CANCELED == thread_ret_fast);
+	
+	
+	void *thread_ret_slow;
+	assert(0 == pthread_join(sample_slow_t, &thread_ret_slow));
+	assert(PTHREAD_CANCELED == thread_ret_slow);
+	
+	
+	
+	
+	
+	
 
-    // Insert some data into the hash table
-    PageAccess page1 = {100, 5};
-    PageAccess page2 = {200, 3};
-    PageAccess page3 = {300, 7};
-
-    pageAccessCount[page1] = 5;
-    pageAccessCount[page2] = 3;
-    pageAccessCount[page3] = 7;
-
-    // Retrieve and print the number of accesses for a specific page address
-    int searchPageAddress = 200;
-    PageAccess searchPage = {searchPageAddress, 0};
-
-    auto it = pageAccessCount.find(searchPage);
-    if (it != pageAccessCount.end()) {
-        printf("Page %d was accessed %d times.\n", searchPage.pageAddress, it->second);
-    } else {
-        printf("Page %d not found in the hash table.\n", searchPage.pageAddress);
-    }
-
-    return 0;
+	return 0;
 }
