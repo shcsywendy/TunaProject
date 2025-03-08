@@ -7,5 +7,5 @@ fi
 
 ./clearcache.sh
 
-numactl -C 20 -m 1 sudo ./memeater $1
+numactl -N 0 -m 1 sudo ./memeater $1
 
